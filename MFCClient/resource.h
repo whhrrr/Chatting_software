@@ -18,6 +18,7 @@
 #define IDC_COLOUR_COMBO                1008
 #define IDC_HISTORYMSG_LIST             1009
 #define IDC_IPADDRESS1                  1010
+#define IDC_IPADDRESS                   1010
 
 // Next default values for new objects
 // 

@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_START_BTN, &CMFCChatServerDlg::OnBnClickedStartBtn)
 END_MESSAGE_MAP()
 
 
@@ -153,3 +154,21 @@ HCURSOR CMFCChatServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CMFCChatServerDlg::OnBnClickedStartBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	TRACE("#####OnBnClickedStartBtn");
+	CString strPort;
+
+	/*从控件里面获取内容*/
+		//获取端口
+	GetDlgItem(IDC_PORT_EDIT)->GetWindowTextW(strPort);
+
+	//CString 转 char*  
+		/*问题：CString 转 char* 都如何实现*/
+	USES_CONVERSION;		//使用宏
+	LPCSTR szPort = (LPCSTR)T2A(strPort);
+	TRACE("szPort = %s ", szPort);
+}

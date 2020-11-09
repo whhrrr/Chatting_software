@@ -7,6 +7,8 @@
 #include "MFCClient.h"
 #include "MFCClientDlg.h"
 #include "afxdialogex.h"
+#include<atlbase.h>
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -161,6 +163,20 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	TRACE("Connect Button");
+	CString strPort, strIP;
+
+/*从控件里面获取内容*/
+	//获取端口
+	GetDlgItem(IDC_PORT_EDIT)->GetWindowTextW(strPort);
+	//获取IP地址
+	GetDlgItem(IDC_IPADDRESS)->GetWindowTextW(strIP);
+
+	//CString 转 char*  
+		/*问题：CString 转 char* 都如何实现*/
+	USES_CONVERSION;		//使用宏
+	LPCSTR szPort = (LPCSTR)T2A(strPort);
+	LPCSTR szIP = (LPCSTR)T2A(strIP);
+	TRACE("szPort = %s , strIP = %s",szPort,szIP);
 }
 
 
