@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CMySocket.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MFCClient.h" />
     <ClInclude Include="MFCClientDlg.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CMySocket.cpp" />
     <ClCompile Include="MFCClient.cpp" />
     <ClCompile Include="MFCClientDlg.cpp" />
     <ClCompile Include="pch.cpp">

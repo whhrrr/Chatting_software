@@ -174,6 +174,7 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 	//CString 转 char*  
 		/*问题：CString 转 char* 都如何实现*/
 	USES_CONVERSION;		//使用宏
+	/*USES_CONVERSION是ATL中的一个宏定义，用于编码转换*/
 	LPCSTR szPort = (LPCSTR)T2A(strPort);
 	LPCSTR szIP = (LPCSTR)T2A(strIP);
 	TRACE("szPort = %s , strIP = %s",szPort,szIP);
