@@ -178,6 +178,7 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 	LPCSTR szPort = (LPCSTR)T2A(strPort);
 	LPCSTR szIP = (LPCSTR)T2A(strIP);
 	TRACE("szPort = %s , strIP = %s",szPort,szIP);
+	TRACE("connect test");
 }
 
 
