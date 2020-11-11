@@ -15,6 +15,7 @@ CServerSocket::~CServerSocket()
 //
 void CServerSocket::OnAccept(int nErrorCode)
 {
+	TRACE("#####OnAccept");
 	CMFCChatServerDlg* dlg = (CMFCChatServerDlg*)AfxGetApp()->GetMainWnd();
 
 

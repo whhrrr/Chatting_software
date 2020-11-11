@@ -1,9 +1,8 @@
 ﻿
 // MFCChatServerDlg.h: 头文件
 //
-
 #pragma once
-
+#include "CServerSocket.h"
 
 // CMFCChatServerDlg 对话框
 class CMFCChatServerDlg : public CDialogEx
@@ -34,4 +33,5 @@ protected:
 public:
 	afx_msg void OnBnClickedStartBtn();
 	CListBox m_list;
+	CServerSocket* m_server;
 };

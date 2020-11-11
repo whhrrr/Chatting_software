@@ -7,6 +7,7 @@
 #include "MFCChatServer.h"
 #include "MFCChatServerDlg.h"
 #include "afxdialogex.h"
+#include "CServerSocket.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -100,6 +101,8 @@ BOOL CMFCChatServerDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));
+
 
 	// TODO: 在此添加额外的初始化代码
 
@@ -172,4 +175,11 @@ void CMFCChatServerDlg::OnBnClickedStartBtn()
 	USES_CONVERSION;		//使用宏
 	LPCSTR szPort = (LPCSTR)T2A(strPort);
 	TRACE("szPort = %s ", szPort);
+	int iPort = _ttoi(strPort);
+	//创建服务器Socket对象
+	m_server = new CServerSocket;
+	//通过创建socket
+	m_server->Create(iPort);
+
+	m_server->Listen();
 }
