@@ -61,6 +61,9 @@ CMFCClientDlg::CMFCClientDlg(CWnd* pParent /*=nullptr*/)
 void CMFCClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	//控件关联
+	DDX_Control(pDX, IDC_HISTORYMSG_LIST, m_list);	
+	DDX_Control(pDX, IDC_SENDMSG_EDIT, m_input);
 }
 
 BEGIN_MESSAGE_MAP(CMFCClientDlg, CDialogEx)
@@ -163,6 +166,7 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	TRACE("Connect Button");
+	//拿到IP和端口
 	CString strPort, strIP;
 
 /*从控件里面获取内容*/
@@ -178,7 +182,16 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 	LPCSTR szPort = (LPCSTR)T2A(strPort);
 	LPCSTR szIP = (LPCSTR)T2A(strIP);
 	TRACE("szPort = %s , strIP = %s",szPort,szIP);
-	TRACE("connect test");
+	
+	//将字符串转换为int型
+	int iPort = _ttoi(strPort);
+	//创建一个SOCKET对象
+	m_client = new CMySocket();
+	//创建套接字
+	m_client->Create();
+	//进程创建和连接
+	m_client->Connect(strIP, iPort);
+	
 }
 
 

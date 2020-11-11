@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CServerSocket.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MFCChatServer.h" />
     <ClInclude Include="MFCChatServerDlg.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CServerSocket.cpp" />
     <ClCompile Include="MFCChatServer.cpp" />
     <ClCompile Include="MFCChatServerDlg.cpp" />
     <ClCompile Include="pch.cpp">

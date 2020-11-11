@@ -59,6 +59,7 @@ CMFCChatServerDlg::CMFCChatServerDlg(CWnd* pParent /*=nullptr*/)
 void CMFCChatServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_MSG_LIST, m_list);
 }
 
 BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
