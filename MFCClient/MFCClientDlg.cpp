@@ -108,7 +108,7 @@ BOOL CMFCClientDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));
-	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("5000"));
+	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("127.0.0.1"));
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -188,8 +188,16 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 	int iPort = _ttoi(strPort);
 	//创建一个SOCKET对象
 	m_client = new CMySocket();
-	//创建套接字
-	m_client->Create();
+	//创建套接字    容错
+	if (!m_client->Create()) 
+	{
+		TRACE("m_client Create error %d",GetLastError());
+		return;
+	}
+	else 
+	{
+		TRACE("m_client Create Success!");
+	}
 	//进程创建和连接
 	m_client->Connect(strIP, iPort);
 	
