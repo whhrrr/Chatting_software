@@ -1,4 +1,4 @@
-﻿
+﻿	
 // MFCChatServerDlg.cpp: 实现文件
 //
 
@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CMFCChatServerDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_START_BTN, &CMFCChatServerDlg::OnBnClickedStartBtn)
+	ON_BN_CLICKED(IDC_SEND_BTN, &CMFCChatServerDlg::OnBnClickedSendBtn)
 END_MESSAGE_MAP()
 
 
@@ -199,4 +200,32 @@ void CMFCChatServerDlg::OnBnClickedStartBtn()
 
 
 
+}
+
+
+void CMFCChatServerDlg::OnBnClickedSendBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString strTmpMsg;
+	GetDlgItem(IDC_SEND_EDIT)->GetWindowTextW(strTmpMsg);	//IDC_SENDMSG_EDIT是编辑框ID  获取内容到strTmpMsg中
+
+	USES_CONVERSION;
+	char* szSendBuf = T2A(strTmpMsg);
+
+	//2、发送给客户端
+	m_chat->Send(szSendBuf, 200, 0);		//暂定200字节
+
+	//3、显示到列表框
+	CString strShow = _T("服务端：");
+	CString strTime;
+	m_tm = CTime::GetCurrentTime();
+	strTime = m_tm.Format("%X ");	//获取时间
+
+	strShow = strTime + strShow;
+	strShow += strTmpMsg;
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
+	//清空编辑框
+	GetDlgItem(IDC_SEND_EDIT)->SetWindowTextW(_T(""));
 }

@@ -72,6 +72,7 @@ BEGIN_MESSAGE_MAP(CMFCClientDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_CONNECT_BTN, &CMFCClientDlg::OnBnClickedConnectBtn)
 	ON_BN_CLICKED(IDC_DISCONNECT_BTN, &CMFCClientDlg::OnBnClickedDisconnectBtn)
+	ON_BN_CLICKED(IDC_SEND_BTN, &CMFCClientDlg::OnBnClickedSendBtn)
 END_MESSAGE_MAP()
 
 
@@ -199,12 +200,46 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 		TRACE("m_client Create Success!");
 	}
 	//进程创建和连接
-	m_client->Connect(strIP, iPort);
+	if(m_client->Connect(strIP, iPort) != SOCKET_ERROR)//不等于无效的SOCKET
+	{
+		TRACE("m_client Connect error %d",GetLastError());
+		return;
+	}
 	
 }
 
-
+//客户端在消息框内发送信息
 void CMFCClientDlg::OnBnClickedDisconnectBtn()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CMFCClientDlg::OnBnClickedSendBtn()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	//发送信息
+	//1、获取编辑框内容
+	CString strTmpMsg;
+	GetDlgItem(IDC_SENDMSG_EDIT)->GetWindowTextW(strTmpMsg);	//IDC_SENDMSG_EDIT是编辑框ID  获取内容到strTmpMsg中
+
+	USES_CONVERSION;
+	char* szSendBuf = T2A(strTmpMsg);
+
+	//2、发送给服务端
+	m_client->Send(szSendBuf, 200, 0);		//暂定200字节
+
+	//3、显示到列表框
+	CString strShow = _T("我：");
+	CString strTime;
+	m_tm = CTime::GetCurrentTime();
+	strTime = m_tm.Format("%X ");	//获取时间
+
+	strShow = strTime + strShow;
+	strShow += strTmpMsg;
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
+	//清空编辑框
+	GetDlgItem(IDC_SENDMSG_EDIT)->SetWindowTextW(_T(""));
 }
