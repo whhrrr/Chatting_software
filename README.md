@@ -1,2 +1,2 @@
-# Chatting_software
-尝试基于MFC创建的聊天软件
+##### 尝试基于MFC创建的聊天软件
+软件基于VS2019中MFC模板进行创建
