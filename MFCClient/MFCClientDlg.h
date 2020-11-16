@@ -34,9 +34,9 @@ protected:
 public:
 	afx_msg void OnBnClickedConnectBtn();
 	afx_msg void OnBnClickedDisconnectBtn();
+	CString CatShowString(CString strInfo,CString strMsg);
 	CMySocket* m_client;
 	CListBox m_list;
-	CTime	m_tm;
 	CEdit m_input;	//shift + alt + f
 	afx_msg void OnBnClickedSendBtn();
 };

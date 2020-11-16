@@ -21,13 +21,13 @@ void CServerSocket::OnAccept(int nErrorCode)
 	dlg->m_chat = new CChatSocket;
 	Accept(*(dlg->m_chat));
 
-	CString str;
-	dlg->m_tm = CTime::GetCurrentTime();
 
+	CString strShow;
+	CString strInfo = _T("客户端连接成功！！！！！");
+	CString strMsg = _T("");
+	strShow = dlg->CatShowString(strInfo, strMsg);
 
-	str = dlg->m_tm.Format("%X ");
-	str += _T("客户端连接成功！！！！！");
-	dlg->m_list.AddString(str);
+	dlg->m_list.AddString(strShow);
 	dlg->m_list.UpdateData(FALSE);
 
 	CAsyncSocket::OnAccept(nErrorCode);

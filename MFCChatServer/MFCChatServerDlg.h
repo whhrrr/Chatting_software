@@ -32,7 +32,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedStartBtn();
+	afx_msg
+	CString CatShowString(CString strInfo, CString strMsg);
+	void OnBnClickedStartBtn();
 	CListBox m_list;
 	CChatSocket* m_chat;
 	CServerSocket* m_server;

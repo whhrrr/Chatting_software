@@ -10,6 +10,7 @@
 
 #include "resource.h"		// 主符号
 
+#define SEND_MAX_BUF 1024		//发送字节数定义宏
 
 // CMFCClientApp:
 // 有关此类的实现，请参阅 MFCClient.cpp
