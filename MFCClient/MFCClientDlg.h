@@ -39,4 +39,5 @@ public:
 	CListBox m_list;
 	CEdit m_input;	//shift + alt + f
 	afx_msg void OnBnClickedSendBtn();
+	afx_msg void OnBnClickedSavenameBtn();
 };

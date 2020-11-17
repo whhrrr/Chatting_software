@@ -73,6 +73,7 @@ BEGIN_MESSAGE_MAP(CMFCClientDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CONNECT_BTN, &CMFCClientDlg::OnBnClickedConnectBtn)
 	ON_BN_CLICKED(IDC_DISCONNECT_BTN, &CMFCClientDlg::OnBnClickedDisconnectBtn)
 	ON_BN_CLICKED(IDC_SEND_BTN, &CMFCClientDlg::OnBnClickedSendBtn)
+	ON_BN_CLICKED(IDC_SAVENAME_BTN, &CMFCClientDlg::OnBnClickedSavenameBtn)
 END_MESSAGE_MAP()
 
 
@@ -108,8 +109,33 @@ BOOL CMFCClientDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
-	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));
-	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("127.0.0.1"));
+	GetDlgItem(IDC_PORT_EDIT)->SetWindowText(_T("5000"));		//端口初始化为5000
+	GetDlgItem(IDC_IPADDRESS)->SetWindowText(_T("127.0.0.1"));	//地址初始化
+	
+//将昵称从配置文件中读取
+	WCHAR wszName[MAX_PATH] = { 0 };			//WCHAT是宽字节的字符串
+	WCHAR strPath[MAX_PATH] = { 0 };
+
+	//获取当前路径
+	GetCurrentDirectoryW(MAX_PATH, strPath);
+
+
+	CString strFilePath;
+	strFilePath.Format(L"%ls//Test.ini", strPath);	//L表示宽字节
+	DWORD dwNum = GetPrivateProfileStringW(_T("CLIENT"),_T("NAME"),NULL, wszName,MAX_PATH,strFilePath);
+	if (dwNum > 0) 
+	{
+		//获取文本框中内容
+		SetDlgItemText(IDC_NAME_EDIT, wszName);
+		UpdateData(FALSE);		//控件关联  更新配置文件
+	}
+	else 
+	{
+		WritePrivateProfileStringW(_T("CLIENT"), _T("NAME"), L"默认名称", strFilePath);
+		SetDlgItemText(IDC_NAME_EDIT,  L"默认名称");
+		UpdateData(FALSE);		//控件关联  更新配置文件
+	}
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -240,6 +266,11 @@ void CMFCClientDlg::OnBnClickedSendBtn()
 	CString strTmpMsg;
 	GetDlgItem(IDC_SENDMSG_EDIT)->GetWindowTextW(strTmpMsg);	//IDC_SENDMSG_EDIT是编辑框ID  获取内容到strTmpMsg中
 
+	CString strName;
+	GetDlgItem(IDC_NAME_EDIT)->GetWindowTextW(strName);
+	strName += ":";
+
+	strTmpMsg = strName + _T("") + strTmpMsg;
 	USES_CONVERSION;
 	char* szSendBuf = T2A(strTmpMsg);
 
@@ -248,11 +279,41 @@ void CMFCClientDlg::OnBnClickedSendBtn()
 
 	//3、显示到列表框
 	CString strShow;
-	CString strInfo = _T("我：");
-	strShow = CatShowString(strInfo, strTmpMsg);
+	strShow = CatShowString(_T(""), strTmpMsg);
 	m_list.AddString(strShow);
 	UpdateData(FALSE);
 
 	//清空编辑框
 	GetDlgItem(IDC_SENDMSG_EDIT)->SetWindowTextW(_T(""));
+}
+
+
+void CMFCClientDlg::OnBnClickedSavenameBtn()
+{
+	CString strName;
+	//获取文本框中内容
+	GetDlgItemText(IDC_NAME_EDIT, strName);
+	if (strName.GetLength() <= 0)	//容错
+	{
+		MessageBox(_T("昵称不能为空！！！"));
+		return;
+	}
+
+	if (IDOK == AfxMessageBox(_T("是否确认修改昵称？"), MB_OKCANCEL)) 
+	{
+		// 保存昵称
+		WCHAR strPath[MAX_PATH] = { 0 };
+
+		//获取当前路径
+		GetCurrentDirectoryW(MAX_PATH, strPath);
+
+
+		CString strFilePath;
+		strFilePath.Format(L"%ls//Test.ini", strPath);	//L表示宽字节
+
+		//写配置文件
+		WritePrivateProfileStringW(_T("CLIENT"), _T("NAME"), strName, strFilePath);
+	}
+	
+
 }
