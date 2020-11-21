@@ -211,7 +211,10 @@
     <None Include="res\MFCChatServer.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\MFCChatServer.ico" />
+    <Image Include="res\server.bmp" />
+    <Image Include="res\ServerGround.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

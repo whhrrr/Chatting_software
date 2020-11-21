@@ -40,4 +40,10 @@ public:
 	CEdit m_input;	//shift + alt + f
 	afx_msg void OnBnClickedSendBtn();
 	afx_msg void OnBnClickedSavenameBtn();
+	// afx_msg void OnBnClickedAutosendRadio();			//控件更改为Check
+	afx_msg void OnBnClickedClearmsgBtn();
+	afx_msg void OnBnClickedAutosendCheck();
+	CComboBox m_WordColorCombo;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

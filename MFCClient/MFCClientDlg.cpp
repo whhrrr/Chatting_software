@@ -62,8 +62,9 @@ void CMFCClientDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	//控件关联
-	DDX_Control(pDX, IDC_HISTORYMSG_LIST, m_list);	
+	DDX_Control(pDX, IDC_HISTORYMSG_LIST, m_list);
 	DDX_Control(pDX, IDC_SENDMSG_EDIT, m_input);
+	DDX_Control(pDX, IDC_COLOUR_COMBO, m_WordColorCombo);
 }
 
 BEGIN_MESSAGE_MAP(CMFCClientDlg, CDialogEx)
@@ -74,6 +75,9 @@ BEGIN_MESSAGE_MAP(CMFCClientDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_DISCONNECT_BTN, &CMFCClientDlg::OnBnClickedDisconnectBtn)
 	ON_BN_CLICKED(IDC_SEND_BTN, &CMFCClientDlg::OnBnClickedSendBtn)
 	ON_BN_CLICKED(IDC_SAVENAME_BTN, &CMFCClientDlg::OnBnClickedSavenameBtn)
+	ON_BN_CLICKED(IDC_CLEARMSG_BTN, &CMFCClientDlg::OnBnClickedClearmsgBtn)
+	ON_BN_CLICKED(IDC_AUTOSEND_CHECK, &CMFCClientDlg::OnBnClickedAutosendCheck)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -135,6 +139,23 @@ BOOL CMFCClientDlg::OnInitDialog()
 		SetDlgItemText(IDC_NAME_EDIT,  L"默认名称");
 		UpdateData(FALSE);		//控件关联  更新配置文件
 	}
+	//初始化控件
+	GetDlgItem(IDC_SEND_BTN)->EnableWindow(FALSE);				//发送按钮隐藏
+	GetDlgItem(IDC_DISCONNECT_BTN)->EnableWindow(FALSE);		//断开连接发送按钮隐藏
+	GetDlgItem(IDC_AUTOSEND_CHECK)->EnableWindow(FALSE);		//自动发送(check)控件隐藏
+	GetDlgItem(IDC_CONNECT_BTN)->EnableWindow(TRUE);			//连接按钮不隐藏
+
+	m_WordColorCombo.AddString(_T("黑色"));
+	m_WordColorCombo.AddString(_T("红色"));
+	m_WordColorCombo.AddString(_T("蓝色"));
+	m_WordColorCombo.AddString(_T("绿色"));
+	m_WordColorCombo.AddString(_T("黄色"));
+
+	m_WordColorCombo.SetCurSel(0);			//设置当前的选择下标为0
+	SetDlgItemText(IDC_COLOUR_COMBO,_T("黑色"));
+
+		
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -177,6 +198,31 @@ void CMFCClientDlg::OnPaint()
 	}
 	else
 	{
+		//1、定义dc
+		CPaintDC dc(this); // 用于绘制的设备上下文
+		//2、确定绘制区域
+		CRect rect;
+		GetClientRect(&rect);
+		CDialogEx::OnPaint();
+
+		//3、定义并创建一个内存设备环境  创建兼容性DC		(CDC类)
+		CDC dcBmp;
+		dcBmp.CreateCompatibleDC(&dcBmp);			//创建与pDc指定的设备兼容的内存设备上下文
+		//4、载入资源图片
+		CBitmap bmpBackGround;
+		bmpBackGround.LoadBitmapW(IDB_ground_BITMAP);
+
+		//5、将图片载入视图  bBitMap位图
+		BITMAP bBitmap;
+		bmpBackGround.GetBitmap(&bBitmap);
+
+		//6、将位图选入临时的内存设备环境
+		CBitmap* pbmpOld = dcBmp.SelectObject(&bmpBackGround);
+
+		//7、绘制（将位图从源矩形复制到目标矩形，必要时可伸缩或压缩位图以符合目标矩形的尺寸）
+		dc.StretchBlt(0, 0, rect.Width(), rect.Height(), &dcBmp,
+			0, 0, bBitmap.bmWidth, bBitmap.bmHeight, SRCCOPY);
+
 		CDialogEx::OnPaint();
 	}
 }
@@ -192,6 +238,11 @@ HCURSOR CMFCClientDlg::OnQueryDragIcon()
 
 void CMFCClientDlg::OnBnClickedConnectBtn()
 {
+
+	GetDlgItem(IDC_SEND_BTN)->EnableWindow(TRUE);				//发送按钮不隐藏
+	GetDlgItem(IDC_DISCONNECT_BTN)->EnableWindow(TRUE);		//断开连接发送按钮不隐藏
+	GetDlgItem(IDC_AUTOSEND_CHECK)->EnableWindow(TRUE);		//自动发送(check)控件不隐藏
+	GetDlgItem(IDC_CONNECT_BTN)->EnableWindow(FALSE);			//连接按钮隐藏(不可被选中)
 	// TODO: 在此添加控件通知处理程序代码
 	TRACE("Connect Button");
 	//拿到IP和端口
@@ -234,10 +285,30 @@ void CMFCClientDlg::OnBnClickedConnectBtn()
 	
 }
 
-//客户端在消息框内发送信息
+//断开连接
 void CMFCClientDlg::OnBnClickedDisconnectBtn()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	//1、控制控件
+	GetDlgItem(IDC_SEND_BTN)->EnableWindow(FALSE);				//发送按钮隐藏
+	GetDlgItem(IDC_DISCONNECT_BTN)->EnableWindow(FALSE);		//断开连接发送按钮隐藏
+	GetDlgItem(IDC_AUTOSEND_CHECK)->EnableWindow(FALSE);		//自动发送(check)控件隐藏
+	GetDlgItem(IDC_CONNECT_BTN)->EnableWindow(TRUE);			//连接按钮不隐藏
+
+	//2、回收资源
+	m_client->Close();
+	if (m_client != NULL) 
+	{
+		delete m_client;
+		m_client = NULL;
+	}
+	
+	//3、显示到列表框
+
+	CString strShow;
+	strShow = CatShowString(_T(""), _T("断开与服务器的连接。"));
+	m_list.AddString(strShow);
+	UpdateData(FALSE);
+
 }
 
 
@@ -265,7 +336,7 @@ void CMFCClientDlg::OnBnClickedSendBtn()
 	//1、获取编辑框内容
 	CString strTmpMsg;
 	GetDlgItem(IDC_SENDMSG_EDIT)->GetWindowTextW(strTmpMsg);	//IDC_SENDMSG_EDIT是编辑框ID  获取内容到strTmpMsg中
-
+	
 	CString strName;
 	GetDlgItem(IDC_NAME_EDIT)->GetWindowTextW(strName);
 	strName += ":";
@@ -316,4 +387,102 @@ void CMFCClientDlg::OnBnClickedSavenameBtn()
 	}
 	
 
+}
+
+/*自动回复控件响应函数                        单选框改为复选框
+void CMFCClientDlg::OnBnClickedAutosendRadio()
+{
+	if (((CButton*)GetDlgItem(IDC_AUTOSEND_RADIO))->GetCheck()) 
+	{
+		((CButton*)GetDlgItem(IDC_AUTOSEND_RADIO))->SetCheck(FALSE);
+	}
+	else 
+	{
+		((CButton*)GetDlgItem(IDC_AUTOSEND_RADIO))->SetCheck(TRUE);
+	}
+}*/
+
+
+void CMFCClientDlg::OnBnClickedClearmsgBtn()
+{
+	// 清屏操作
+	m_list.ResetContent();
+
+}
+
+
+void CMFCClientDlg::OnBnClickedAutosendCheck()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (((CButton*)GetDlgItem(IDC_AUTOSEND_CHECK))->GetCheck())
+	{
+		((CButton*)GetDlgItem(IDC_AUTOSEND_CHECK))->SetCheck(FALSE);
+	}
+	else
+	{
+		((CButton*)GetDlgItem(IDC_AUTOSEND_CHECK))->SetCheck(TRUE);
+	}
+}
+
+
+HBRUSH CMFCClientDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+	CString strColor;
+	m_WordColorCombo.GetWindowTextW(strColor);		//拿到当前设置颜色到标题中
+
+	if (IDC_HISTORYMSG_LIST == pWnd->GetDlgCtrlID() || IDC_SENDMSG_EDIT == pWnd->GetDlgCtrlID())
+	{
+		if (strColor == L"黑色")
+		{
+			pDC->SetTextColor(RGB(0, 0, 0));
+		}else if (strColor == L"红色")
+		{
+			pDC->SetTextColor(RGB(0, 0, 0));
+		}
+		else if (strColor == L"蓝色")
+		{
+			pDC->SetTextColor(RGB(0, 0, 255));
+		}
+		else if (strColor == L"绿色")
+		{
+			pDC->SetTextColor(RGB(0, 255, 0));
+		}
+		else if (strColor == L"黄色")
+		{
+			pDC->SetTextColor(RGB(255, 255, 0));
+		}
+	}
+
+
+	return hbr;
+}
+
+
+BOOL CMFCClientDlg::PreTranslateMessage(MSG* pMsg)
+{
+	//快捷键使用
+	//规避回车键
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN) 
+	{
+		return TRUE;
+	}
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_SPACE)
+	{
+		return TRUE;
+	}
+	//添加快捷键 ctrl + x 退出对话框
+	if (pMsg->message == WM_KEYDOWN )
+	{
+		if (GetKeyState(VK_CONTROL) < 0)	//ctrl键是否按下
+		{
+			if (pMsg->wParam == 'X') 
+			{
+				CDialog::OnOK();		//退出
+			}
+		}
+	}
+
+
+	return CDialogEx::PreTranslateMessage(pMsg);
 }

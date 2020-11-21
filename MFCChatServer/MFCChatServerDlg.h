@@ -40,4 +40,13 @@ public:
 	CServerSocket* m_server;
 	CTime m_tm;
 	afx_msg void OnBnClickedSendBtn();
+	afx_msg void OnBnClickedClearBtn();
+	afx_msg void OnBnClickedStopBtn();
+	CComboBox m_WordColorCombo;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnBnClickedCalBtn();
+	afx_msg void OnBnClickedMailBtn();
+	afx_msg void OnBnClickedQqBtn();
+	afx_msg void OnBnClickedBaiduBtn();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

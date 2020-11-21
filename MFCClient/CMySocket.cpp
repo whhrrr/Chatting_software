@@ -50,7 +50,29 @@ void CMySocket::OnReceive(int nErrorCode)
 	strShow = dlg->CatShowString(strInfo, strRecvMsg);
 	dlg->m_list.AddString(strShow);
 
+	//选中单选框按钮
+	if (((CButton*)dlg->GetDlgItem(IDC_AUTOSEND_CHECK))->GetCheck())
+	{
+		//自动回复
+		//1、读编辑框的内容
+		CString strAutoSendMsg;
+		dlg->GetDlgItemText(IDC_AUTOSENDMSG_EDIT, strAutoSendMsg);
+		
+		//2、封包 + 组格式  时间+昵称+自动回复+内容
+		CString strName;
+		dlg->GetDlgItemTextW(IDC_NAME_EDIT, strName);
+		//发送的消息
+		CString strMsg = strName +  _T("[自动回复]:") + strAutoSendMsg;
+		//消息发送给服务端
+		char* szSendBuf = T2A(strMsg);
+		dlg->m_client->Send(szSendBuf, SEND_MAX_BUF, 0);
 
-	dlg->m_list.AddString(strShow);
+		//时间 + 昵称 + strMsg
+		strShow = dlg->CatShowString(_T(""),strMsg);
+		dlg->m_list.AddString(strShow);
+		dlg->m_list.UpdateData(FALSE);
+	}
+
+
 	CAsyncSocket::OnReceive(nErrorCode);
 }
