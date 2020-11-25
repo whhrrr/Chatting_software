@@ -32,33 +32,70 @@
 
 7 、特别注意：难点，那就是在客户方调用Connect()连接服务方，那么服务方如何Accept()，以建立连接的问题。简单的做法就是在监听的Socket收到OnAccept()时，用一个新的CAsyncSocket对象去建立连接
 
-
-
-服务端需要重写2个类：因为服务端有两类Socket,一类是服务器serversocket，一类是每来一个连接的socket
-
 *** 
 
 *** 
 
-###### 建立连接：
+###### 建立连接与收发消息：
 
-`服务端`创建一个对象用来传递等待连接的信息。调用Accept用来接收信息。接收到信息之后创建一个CChatSocket对象用来接发消息。然后刷新控件
+1、从控件中获取IP地址及端口，调用GetDlgItem()->GetWindowTextW函数。使用USES_CONVERSION宏来转换CString为char*
 
-`客户端`接收建立连接函数`void CmySocket::OnConnect(int nErrorCode)`。创建一个客户端对象dlg并与创建的连接进行通信。如果创建成功调用OnSend函数发送信息提示连接成功
+> USES_CONVERSION是ALT中的一个宏定义用于编码转换。要想使用这个宏需要加上头文件#include<atlcon.h> USES_CONVERSION从堆栈上分配内存，直到调用它的函数返回。该内存不会被释放，如果在一个循环中这个宏被反复调用会导致stackoverflow.
 
-***
 
-###### 收发消息
+
+`客户端`需要重写Socket类，在控件连接按钮的操作函数上生成一个新的CMySocket对象创建套接字调用Connect去连接。连接成功会调用Connect函数后会回调OnConnect函数。在界面上显示信息。发送函数会通过Send函数发送给服务端然后将自身发送的信息显示到列表框(MFCClientDlg.cpp中实现)。接收函数主要是会通过创建的CMySocket调用回调函数OnReceive，通过格式转换将接收到的信息显示到客户端。
+
+`服务端`需要重写2个类：因为服务端有两类Socket,一类是服务器serversocket，一类是每来一个连接的socket。在server端启动按钮处理函数中创建服务器Socket对象创建套接字。进行连接。进行连接之后创建新的Socket对象与服务器进行通信。调用Accept开始接收连接。发送消息控件处理函数与客户端类似。
 
 ***
 
 ###### 自动回复
 
+在客户端重写的Socket类中重写了OnReceive函数负责接收服务端发来的信息产生回调。如果自动回复控件被勾选那么出发自动恢复处理程序。通过调用客户端Send函数向服务端发送编辑框内自动回复信息(CMySocket.cpp中实现)
+
 ***
 
 ###### 颜色更改及保存配置信息
+
+在客户端和服务端中存在颜色设置选项，那么需要使用GetWindowTextW拿到控件的颜色选择。调用SetTextColor()函数改变字体颜色。保存配置信息需要在初始化中添加处理配置文件函数，如果处理没有配置文件就设置名称为默认名称。如果配置文件存在那么就设置控件中内容为获取的内容。保存昵称控件作用为修改昵称。首先需要保证控件中内容不为空。如果确认那么就将配置信息写入配置文件。
 
 ***
 
 ###### 断开连接
 
+断开连接首先就是把m_client、m_server、m_chat资源回收。将资源重新置为NULL。然后显示到列表框中。三者实际上就是通信中调用的中间支持者。
+
+###### 快捷打开以及快捷键使用
+
+使用ShellExecute可以支持快捷打开exe文件
+
+快捷键使用主要是对按键按下时的处理。
+
+示例代码：
+
+```cpp
+
+
+if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+    {
+        return TRUE;
+    }
+    if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_SPACE)
+    {
+        return TRUE;
+    }
+    //添加快捷键 ctrl + x 退出对话框
+    if (pMsg->message == WM_KEYDOWN)
+    {
+        if (GetKeyState(VK_CONTROL) < 0)    //ctrl键是否按下
+        {
+            if (pMsg->wParam == 'X')
+            {
+                CDialog::OnOK();        //退出
+}}}
+```
+
+总结：客户端与服务端的通信最重要的是回调函数接发信息。主要的实现除了初始化的基本流程之外主要是对C++中面向对象性质的理解。例如不论是接收信息还是发送信息都需要创建的对象去调用函数才能完成。例如在Server端用一个m_server接收一个连接请求就会重新创建一个Socket对象m_chat去进行接发消息。而m_server只是用来接收信息。在客户端中不论是收发消息还是创建连接都会用m_client对象去调用函数。
+
+不足：其实对于MFC中控件的使用还是不太熟悉。在视频和帮助文档的帮助下才能完成。需要通过MFC的学习了解通信的基本流程，熟悉开发的流程。
