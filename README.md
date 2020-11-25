@@ -19,3 +19,46 @@
 通用函数：获取当前时间函数，如果在发送消息的过程中加上发送消息的时间，那么需要获取系统当前时间。
 
 如果发送消息需要标准化格式，包括`时间` + `信息` + `消息`。给两个发送函数的cpp文件中都添加上一个发送消息标准化的函数
+> 简易版本网络通信
+##### C++实现Socket编程---异步非阻塞Socket封装类CSsyncSocket
+
+    使用MSDN去查看类：https://msdn.microsoft.com/zh-cn/?query=
+1、CAsyncSocket::Create()，使用#include<afxsock.h>头文件，用AfxSocketInit()初始化。
+2、`异步非阻塞`    ???
+3、重写一个类，客户端和服务端
+4、收到Socket事间之后，只是简单地回调CAsyncSocket::OnReceive()等虚函数，所以CAsuncSocket的派生类，只需要在这些虚函数里添加发送和接收代码
+5、客户方在使用CAsyncSocket::Connect()时，往往返回一个WSAEWOULDBLOCK的错误(其他函数调用也是如此)。 实际上这不应该算作一个错误，它是Socket提醒我们，由于你使用了非阻塞Socket方式，所以(连接)操作需要时间，不能瞬间建立。
+6 、事实上，我们可以在Connect()调用之后等待CAsyncSocket::OnConnect()事件被触发，CAsyncSocket::OnConnect()是要表明Socket要么连接成功了，要么连接彻底失败了。至此，我们在CAsyncSocket::OnConnect()被调用之后就知道是否Socket连接成功了，还是失败了
+
+7 、特别注意：难点，那就是在客户方调用Connect()连接服务方，那么服务方如何Accept()，以建立连接的问题。简单的做法就是在监听的Socket收到OnAccept()时，用一个新的CAsyncSocket对象去建立连接
+
+
+
+服务端需要重写2个类：因为服务端有两类Socket,一类是服务器serversocket，一类是每来一个连接的socket
+
+*** 
+
+*** 
+
+###### 建立连接：
+
+`服务端`创建一个对象用来传递等待连接的信息。调用Accept用来接收信息。接收到信息之后创建一个CChatSocket对象用来接发消息。然后刷新控件
+
+`客户端`接收建立连接函数`void CmySocket::OnConnect(int nErrorCode)`。创建一个客户端对象dlg并与创建的连接进行通信。如果创建成功调用OnSend函数发送信息提示连接成功
+
+***
+
+###### 收发消息
+
+***
+
+###### 自动回复
+
+***
+
+###### 颜色更改及保存配置信息
+
+***
+
+###### 断开连接
+
